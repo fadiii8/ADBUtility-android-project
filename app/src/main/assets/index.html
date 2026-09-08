@@ -1,0 +1,4832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no"
+    >
+
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>ADB Utility</title>
+
+    <style>
+        /* =========================================================
+   ADB UTILITY
+   Ultra Glass Design System - FINAL PERFECTED
+   ========================================================= */
+
+:root {
+    /* Modern Gradient Theme - Purple to Teal */
+    --gradient-start: #7c3aed;
+    --gradient-mid: #8b5cf6;
+    --gradient-end: #06b6d4;
+    
+    --accent: #7c3aed;
+    --accent-2: #8b5cf6;
+    --accent-3: #06b6d4;
+    --accent-glow: rgba(124, 58, 237, 0.2);
+
+    /* Light Theme - Ultra Glass */
+    --bg-primary: #e8edf5;
+    --bg-secondary: #dce2ed;
+    --bg-tertiary: rgba(255, 255, 255, 0.6);
+    
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a6a;
+    --text-tertiary: #8a8aaa;
+    
+    --glass-bg: rgba(255, 255, 255, 0.35);
+    --glass-bg-strong: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --radius-2xl: 40px;
+    --radius-full: 9999px;
+
+    --nav-height: 76px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+    --blur: 4px;
+    --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+html[data-theme="dark"] {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #111827;
+    --bg-tertiary: rgba(26, 34, 54, 0.8);
+    
+    --text-primary: #f0f2f8;
+    --text-secondary: #a8b3c8;
+    --text-tertiary: #6b7a9a;
+    
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-bg-strong: rgba(255, 255, 255, 0.18);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    
+    --accent: #8b5cf6;
+    --accent-2: #a78bfa;
+    --accent-3: #22d3ee;
+    --accent-glow: rgba(139, 92, 246, 0.3);
+}
+
+/* =========================================================
+   SYSTEM THEME
+   ========================================================= */
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] {
+        --bg-primary: #0a0e1a;
+        --bg-secondary: #111827;
+        --bg-tertiary: rgba(26, 34, 54, 0.8);
+        
+        --text-primary: #f0f2f8;
+        --text-secondary: #a8b3c8;
+        --text-tertiary: #6b7a9a;
+        
+        --glass-bg: rgba(255, 255, 255, 0.08);
+        --glass-bg-strong: rgba(255, 255, 255, 0.18);
+        --glass-border: rgba(255, 255, 255, 0.12);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        
+        --accent: #8b5cf6;
+        --accent-2: #a78bfa;
+        --accent-3: #22d3ee;
+        --accent-glow: rgba(139, 92, 246, 0.3);
+    }
+}
+
+/* =========================================================
+   RESET & BASE
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+    background: var(--bg-primary);
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100dvh;
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+
+    transition: 
+        background var(--transition),
+        color var(--transition);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* =========================================================
+   APP SHELL
+   ========================================================= */
+
+.app-shell {
+    position: relative;
+    width: 100%;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: var(--bg-primary);
+    transition: background var(--transition);
+}
+
+.app-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 92px 16px calc(var(--nav-height) + var(--safe-bottom) + 30px);
+}
+
+/* =========================================================
+   AMBIENT BACKGROUND - REMOVED GLOWING BALLS
+   ========================================================= */
+
+.ambient-background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--bg-primary);
+    transition: background var(--transition);
+}
+
+/* Removed all gradient orbs - clean background only */
+
+/* =========================================================
+   GLASS BASE - Ultra Glass Effect
+   ========================================================= */
+
+.glass-panel {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: all var(--transition);
+}
+
+/* Ultra Glass Water Drop Effect */
+.glass-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: 
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.4) 0%,
+            transparent 20%,
+            transparent 80%,
+            rgba(255, 255, 255, 0.1) 100%
+        );
+    z-index: -1;
+}
+
+/* Remove double outline */
+.glass-panel::after {
+    display: none;
+}
+
+/* Liquid Glass Effect OFF */
+html[data-glass="off"] .glass-panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+html[data-glass="off"] .glass-panel::before,
+html[data-glass="off"] .glass-panel::after {
+    display: none;
+}
+
+html[data-theme="dark"][data-glass="off"] .glass-panel {
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+
+.topbar {
+    position: fixed;
+    z-index: 20;
+    top: max(10px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(calc(100% - 20px), 540px);
+    min-height: 64px;
+    padding: 10px 12px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--glass-shadow);
+}
+
+.brand-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.brand-mark {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.brand-mark svg {
+    width: 22px;
+    height: 22px;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.brand-text strong {
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: -0.2px;
+    color: var(--text-primary);
+}
+
+.brand-text span {
+    color: var(--text-secondary);
+    font-size: 10px;
+    line-height: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.connection-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.connection-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+    box-shadow: 0 0 0 4px rgba(155, 165, 183, 0.12);
+    transition: all var(--transition);
+}
+
+.connection-pill.connected .connection-dot {
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.connection-pill.connected {
+    color: #10b981;
+}
+
+/* =========================================================
+   PAGE SYSTEM
+   ========================================================= */
+
+.page {
+    display: none;
+    animation: pageEnter 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+.page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+.page-heading h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 32px;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+}
+
+.page-heading p {
+    margin: 5px 0 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.glass-button {
+    position: relative;
+    overflow: hidden;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition);
+}
+
+/* Water drop effect on buttons */
+.glass-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(
+            circle at 30% 25%,
+            rgba(255, 255, 255, 0.4) 0%,
+            transparent 50%
+        );
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.glass-button:active {
+    transform: scale(0.97);
+}
+
+.glass-button:hover {
+    background: var(--glass-bg-strong);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.icon-button {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--glass-shadow);
+}
+
+.icon-button svg {
+    width: 19px;
+    height: 19px;
+}
+
+/* =========================================================
+   DEVICE CARD
+   ========================================================= */
+
+.device-card {
+    overflow: hidden;
+    padding: 18px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 22px;
+}
+
+.water-highlight {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    right: -60px;
+    top: -80px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.5) 0%,
+        transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+html[data-theme="dark"] .water-highlight {
+    opacity: 0.15;
+}
+
+.device-top {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.device-icon {
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    color: var(--accent);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.device-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.device-heading {
+    min-width: 0;
+}
+
+.status-label {
+    display: inline-flex;
+    margin-bottom: 3px;
+    color: var(--text-tertiary);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.device-heading h2 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 21px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.device-heading p {
+    margin: 3px 0 0;
+    color: var(--text-secondary);
+    font-size: 10px;
+    line-height: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.device-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.info-item {
+    min-width: 0;
+    padding: 11px;
+    border-radius: var(--radius-sm);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.info-item span {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--text-tertiary);
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.info-item strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.section-title {
+    margin: 0 3px 10px;
+    color: var(--text-tertiary);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   ACTION CARDS
+   ========================================================= */
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    margin-bottom: 18px;
+}
+
+.action-card {
+    width: 100%;
+    min-height: 70px;
+    padding: 11px;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    box-shadow: var(--glass-shadow);
+}
+
+.action-card:not(:disabled):active {
+    transform: scale(0.975);
+}
+
+.action-card:disabled {
+    opacity: 0.47;
+    filter: saturate(0.7);
+}
+
+.action-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.action-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.action-copy {
+    min-width: 0;
+    flex: 1;
+    margin-left: 11px;
+}
+
+.action-copy strong {
+    display: block;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--text-primary);
+}
+
+.action-copy span {
+    display: block;
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 10px;
+}
+
+.action-arrow {
+    width: 17px;
+    height: 17px;
+    color: var(--text-tertiary);
+    margin-right: 3px;
+}
+
+/* =========================================================
+   OPERATION CARD
+   ========================================================= */
+
+.operation-card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+}
+
+.operation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.operation-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.operation-badge {
+    padding: 6px 9px;
+    border-radius: var(--radius-full);
+    background: var(--glass-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+}
+
+.operation-badge.running {
+    color: var(--accent);
+}
+
+.operation-badge.success {
+    color: #10b981;
+}
+
+.operation-badge.error {
+    color: #ef4444;
+}
+
+.progress-track {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+    box-shadow: 0 0 16px var(--accent-glow);
+    transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.operation-hint {
+    margin: 9px 0 0;
+    color: var(--text-tertiary);
+    font-size: 9px;
+}
+
+/* =========================================================
+   TERMINAL
+   ========================================================= */
+
+.terminal-card {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.terminal-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 3px 10px;
+}
+
+.terminal-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    color: var(--text-secondary);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.terminal-led {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+}
+
+.terminal-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.small-button {
+    min-height: 30px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.small-button svg {
+    width: 12px;
+    height: 12px;
+}
+
+.danger-soft {
+    color: #ef4444;
+}
+
+/* Terminal Output - Pure Black */
+.terminal-output {
+    width: 100%;
+    height: 360px;
+    overflow-y: auto;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    background: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #c8d5e9;
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    font-size: 10px;
+    line-height: 17px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.terminal-line {
+    min-height: 17px;
+}
+
+.terminal-line.command {
+    color: #a78bfa;
+}
+
+.terminal-line.output {
+    color: #c8d5e9;
+}
+
+.terminal-line.error {
+    color: #f87171;
+}
+
+.terminal-line.system {
+    color: #22d3ee;
+}
+
+.terminal-form {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    padding: 5px 5px 5px 11px;
+    min-height: 48px;
+    border-radius: var(--radius-sm);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.terminal-prompt {
+    color: var(--accent);
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+    font-weight: 900;
+}
+
+.terminal-form input {
+    min-width: 0;
+    flex: 1;
+    height: 38px;
+    border: 0;
+    outline: 0;
+    color: var(--text-primary);
+    background: transparent;
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+    font-size: 10px;
+}
+
+.terminal-form input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.send-button {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.send-button svg {
+    width: 17px;
+    height: 17px;
+}
+
+.terminal-history {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 15px;
+    border-radius: var(--radius-md);
+}
+
+.terminal-history strong {
+    display: block;
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.history-count {
+    min-width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    background: var(--glass-bg);
+    font-size: 9px;
+    font-weight: 900;
+}
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+.settings-section {
+    padding: 15px;
+    border-radius: var(--radius-md);
+    margin-bottom: 9px;
+}
+
+.settings-section-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 14px;
+}
+
+.settings-section-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.settings-section-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.settings-section-title strong {
+    display: block;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.settings-section-title span {
+    display: block;
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 9px;
+}
+
+/* =========================================================
+   THEME SELECTOR - Fixed double border
+   ========================================================= */
+
+.theme-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+
+.theme-choice {
+    min-height: 66px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition);
+}
+
+.theme-choice.active {
+    color: var(--accent);
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-glow);
+    transform: scale(1.02);
+}
+
+.theme-choice:not(.active):hover {
+    background: var(--glass-bg-strong);
+}
+
+.theme-choice strong {
+    font-size: 9px;
+    transition: color var(--transition);
+}
+
+.theme-preview {
+    width: 30px;
+    height: 20px;
+    border-radius: 7px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.light-preview {
+    background: linear-gradient(135deg, #e8edf5, #ffffff);
+}
+
+.dark-preview {
+    background: linear-gradient(135deg, #0a0e1a, #1a2236);
+}
+
+.system-preview {
+    background: linear-gradient(90deg, #e8edf5 50%, #0a0e1a 50%);
+}
+
+/* =========================================================
+   SETTING ROWS
+   ========================================================= */
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 69px;
+    padding: 11px 13px;
+    border-radius: var(--radius-md);
+    margin-bottom: 9px;
+}
+
+.setting-icon {
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.setting-icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.setting-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.setting-copy strong {
+    display: block;
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.setting-copy span {
+    display: block;
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 8px;
+    line-height: 13px;
+}
+
+/* Toggle */
+.toggle {
+    position: relative;
+    width: 44px;
+    height: 25px;
+    flex: 0 0 44px;
+    padding: 3px;
+    border-radius: var(--radius-full);
+    background: var(--text-tertiary);
+    border: 1px solid var(--glass-border);
+    transition: background var(--transition);
+}
+
+.toggle span {
+    display: block;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition);
+}
+
+.toggle.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+}
+
+.toggle.active span {
+    transform: translateX(17px);
+}
+
+.settings-buttons {
+    display: grid;
+    gap: 7px;
+}
+
+.wide-button {
+    width: 100%;
+    min-height: 45px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 800;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.reset-button {
+    color: #ef4444;
+}
+
+/* =========================================================
+   ABOUT
+   ========================================================= */
+
+.about-hero {
+    padding: 24px 18px;
+    text-align: center;
+    border-radius: var(--radius-lg);
+    margin-bottom: 10px;
+}
+
+.about-logo {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 13px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+.about-logo svg {
+    width: 31px;
+    height: 31px;
+}
+
+.about-hero h2 {
+    margin: 0;
+    font-size: 21px;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+}
+
+.about-hero p {
+    max-width: 360px;
+    margin: 7px auto 13px;
+    color: var(--text-secondary);
+    font-size: 10px;
+    line-height: 17px;
+}
+
+.version-badge {
+    display: inline-flex;
+    padding: 6px 9px;
+    border-radius: var(--radius-full);
+    color: var(--accent);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.developer-card {
+    padding: 15px;
+    border-radius: var(--radius-md);
+    margin-bottom: 9px;
+}
+
+.developer-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.developer-avatar {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.developer-heading strong {
+    display: block;
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.developer-card p {
+    margin: 11px 2px 0;
+    color: var(--text-secondary);
+    font-size: 9px;
+    line-height: 15px;
+}
+
+.developer-handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 10px 2px 0;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.developer-handle:active,
+.developer-handle:hover {
+    text-decoration: underline;
+}
+
+.about-note {
+    padding: 14px;
+    border-radius: var(--radius-md);
+}
+
+.about-note span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.about-note p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 9px;
+    line-height: 15px;
+}
+
+/* =========================================================
+   BOTTOM NAVIGATION - Ultra rounded
+   ========================================================= */
+
+.bottom-navigation {
+    position: fixed;
+    z-index: 30;
+    bottom: max(10px, calc(var(--safe-bottom) + 7px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(calc(100% - 20px), 540px);
+    min-height: var(--nav-height);
+    padding: 7px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--glass-shadow);
+}
+
+.nav-item {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: var(--radius-xl);
+    background: transparent;
+    color: var(--text-tertiary);
+    padding: 6px 0;
+    transition: all var(--transition);
+}
+
+.nav-item svg {
+    width: 19px;
+    height: 19px;
+}
+
+.nav-item span {
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.nav-item.active {
+    color: var(--accent);
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    transform: scale(1.02);
+}
+
+.nav-item:active {
+    transform: scale(0.94);
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.toast-container {
+    position: fixed;
+    z-index: 100;
+    left: 50%;
+    bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
+    transform: translateX(-50%);
+    width: min(calc(100% - 32px), 480px);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    pointer-events: none;
+}
+
+.toast {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    font-size: 10px;
+    line-height: 15px;
+    animation: toastIn 220ms ease forwards;
+}
+
+.toast.hide {
+    animation: toastOut 180ms ease forwards;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+/* =========================================================
+   MOTION OFF
+   ========================================================= */
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 360px) {
+    .app-content {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .topbar {
+        width: calc(100% - 14px);
+    }
+
+    .bottom-navigation {
+        width: calc(100% - 14px);
+    }
+
+    .brand-text span {
+        display: none;
+    }
+
+    .connection-pill {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .page-heading h1 {
+        font-size: 25px;
+    }
+
+    .device-card {
+        padding: 15px;
+    }
+
+    .device-icon {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+    }
+
+    .device-heading h2 {
+        font-size: 15px;
+    }
+
+    .terminal-output {
+        height: 330px;
+    }
+
+    .small-button {
+        padding: 0 7px;
+    }
+}
+
+@media (max-width: 330px) {
+    .brand-mark {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .brand-text strong {
+        font-size: 12px;
+    }
+
+    .connection-pill {
+        font-size: 8px;
+    }
+
+    .device-info-grid {
+        gap: 5px;
+    }
+
+    .info-item {
+        padding: 9px;
+    }
+
+    .terminal-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .terminal-actions {
+        width: 100%;
+    }
+
+    .small-button {
+        flex: 1;
+    }
+}
+
+/* =========================================================
+   TOUCH & HOVER
+   ========================================================= */
+
+@media (hover: hover) {
+    .glass-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-card:not(:disabled):hover {
+        transform: translateY(-2px);
+    }
+
+    .nav-item:hover:not(.active) {
+        color: var(--text-secondary);
+        background: var(--glass-bg);
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+    }
+}
+    </style>
+
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- Ambient Background -->
+    <div class="ambient-background" aria-hidden="true">
+        <div class="gradient-orb orb-one"></div>
+        <div class="gradient-orb orb-two"></div>
+        <div class="gradient-orb orb-three"></div>
+    </div>
+
+    <!-- Top Header -->
+    <header class="topbar glass-panel">
+
+        <div class="brand-area">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M7 7.5L4.5 10L7 12.5M17 7.5L19.5 10L17 12.5M14 5L10 15"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </div>
+
+            <div class="brand-text">
+                <strong>ADB Utility</strong>
+                <span>Android Device Control</span>
+            </div>
+        </div>
+
+        <div class="connection-pill" id="connectionIndicator">
+            <span class="connection-dot"></span>
+            <span id="connectionText">Bridge Offline</span>
+        </div>
+
+    </header>
+
+    <!-- Main Application -->
+    <main class="app-content">
+
+        <!-- ================= HOME ================= -->
+        <section class="page active" data-page="home">
+
+            <div class="page-heading">
+                <div>
+                    <span class="eyebrow">DEVICE CONTROL</span>
+                    <h1>Dashboard</h1>
+                    <p>Manage your connected Android device.</p>
+                </div>
+
+                <button class="icon-button glass-button" id="refreshDevice" type="button" aria-label="Refresh device">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M20 11A8.1 8.1 0 0 0 5.3 6.2L3 8.5M3 8.5V4.5M3 8.5H7M4 13A8.1 8.1 0 0 0 18.7 17.8L21 15.5M21 15.5V19.5M21 15.5H17"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Device Card -->
+            <article class="device-card glass-panel">
+
+                <div class="water-highlight"></div>
+
+                <div class="device-top">
+                    <div class="device-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <rect
+                                x="6.5"
+                                y="2.5"
+                                width="11"
+                                height="19"
+                                rx="2.5"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                            />
+                            <path
+                                d="M10 5H14M11 18.5H13"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </div>
+
+                    <div class="device-heading">
+                        <span class="status-label" id="deviceState">NOT CONNECTED</span>
+                        <h2 id="deviceName">No device detected</h2>
+                        <p id="deviceModel">Connect an Android device to begin.</p>
+                    </div>
+                </div>
+
+                <div class="device-info-grid">
+                    <div class="info-item">
+                        <span>Model</span>
+                        <strong id="infoModel">—</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Android</span>
+                        <strong id="infoAndroid">—</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Build</span>
+                        <strong id="infoBuild">—</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Serial</span>
+                        <strong id="infoSerial">—</strong>
+                    </div>
+                </div>
+
+            </article>
+
+            <!-- OTG Target Device Card -->
+            <article class="device-card glass-panel" id="otgCard">
+                <div class="device-top">
+                    <div class="device-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M4 8H2M4 16H2M20 8H22M20 16H22M8 20V22M16 20V22M8 2V4M16 2V4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <rect x="4" y="4" width="16" height="16" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
+                        </svg>
+                    </div>
+                    <div class="device-heading">
+                        <span class="status-label" id="otgStatusPill">NOT CONNECTED</span>
+                        <h2>OTG Target Device</h2>
+                        <p>Connect another phone over an OTG cable (ADB or Fastboot).</p>
+                    </div>
+                </div>
+                <button class="glass-button" id="otgConnectButton" type="button" style="width:100%; margin-top:12px; padding:12px;">
+                    Connect via OTG
+                </button>
+
+                <div id="otgLogActions" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+                    <button class="small-button glass-button" type="button" data-otg-log="logcat -d">Logcat</button>
+                    <button class="small-button glass-button" type="button" data-otg-log="dmesg">dmesg</button>
+                    <button class="small-button glass-button" type="button" data-otg-log="cat /proc/kmsg 2>&amp;1 | head -c 200000">kmsg</button>
+                    <button class="small-button glass-button" type="button" data-otg-log="cat /sys/fs/pstore/* 2>&amp;1">pstore</button>
+                </div>
+
+                <div id="otgFastbootActions" style="display:none; flex-wrap:wrap; gap:8px; margin-top:12px;">
+                    <button class="small-button glass-button" type="button" data-fastboot-action="reboot-bootloader">Reboot Bootloader</button>
+                    <button class="small-button glass-button" type="button" data-fastboot-action="reboot">Reboot</button>
+                    <button class="small-button glass-button" type="button" data-fastboot-action="unlock">Unlock</button>
+                    <button class="small-button glass-button" type="button" data-fastboot-action="lock">Lock</button>
+                    <button class="small-button glass-button" type="button" data-fastboot-action="flash">Flash Partition</button>
+                    <button class="small-button danger-soft glass-button" type="button" data-fastboot-action="erase">Erase Partition</button>
+                </div>
+            </article>
+
+            <!-- Quick Actions -->
+            <div class="section-title">
+                <span>QUICK ACTIONS</span>
+            </div>
+
+            <div class="actions-grid">
+                <button
+                    class="action-card glass-panel glass-button"
+                    data-operation="reboot"
+                    type="button"
+                >
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 3V12M7.2 5.5A8 8 0 1 0 19 10"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </div>
+                    <div class="action-copy">
+                        <strong>Reboot</strong>
+                        <span>Restart device</span>
+                    </div>
+                    <svg class="action-arrow" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M9 5L16 12L9 19"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+
+                <button
+                    class="action-card glass-panel glass-button"
+                    data-operation="bootloader"
+                    type="button"
+                >
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 3V15M7 10L12 15L17 10M5 20H19"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </div>
+                    <div class="action-copy">
+                        <strong>Bootloader</strong>
+                        <span>Enter bootloader</span>
+                    </div>
+                    <svg class="action-arrow" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M9 5L16 12L9 19"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+
+                <button
+                    class="action-card glass-panel glass-button"
+                    data-operation="recovery"
+                    type="button"
+                >
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M5 12A7 7 0 0 1 18.7 9M19 5V9H15M19 12A7 7 0 0 1 5.3 15M5 19V15H9"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </div>
+                    <div class="action-copy">
+                        <strong>Recovery</strong>
+                        <span>Enter recovery</span>
+                    </div>
+                    <svg class="action-arrow" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M9 5L16 12L9 19"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Operation Status -->
+            <article class="operation-card glass-panel">
+                <div class="operation-header">
+                    <div>
+                        <span class="eyebrow">OPERATION</span>
+                        <h3 id="operationStatus">Ready</h3>
+                    </div>
+                    <span class="operation-badge" id="operationBadge">IDLE</span>
+                </div>
+                <div class="progress-track">
+                    <div
+                        class="progress-bar"
+                        id="operationProgress"
+                        style="width:0%"
+                    ></div>
+                </div>
+                <p class="operation-hint">
+                    Connect a device and choose an operation.
+                </p>
+            </article>
+
+        </section>
+
+        <!-- ================= TERMINAL ================= -->
+        <section class="page" data-page="terminal">
+
+            <div class="page-heading">
+                <div>
+                    <span class="eyebrow">COMMAND CENTER</span>
+                    <h1>Terminal</h1>
+                    <p>Execute commands through the native ADB bridge.</p>
+                </div>
+            </div>
+
+            <article class="terminal-card glass-panel">
+                <div class="terminal-toolbar">
+                    <div class="terminal-status">
+                        <span class="terminal-led"></span>
+                        <span id="terminalDisconnected">Bridge waiting</span>
+                    </div>
+                    <div class="terminal-actions">
+                        <button
+                            class="small-button glass-button"
+                            id="copyLogs"
+                            type="button"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <rect x="8" y="8" width="11" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4H5.5A1.5 1.5 0 0 0 4 5.5V15A1.5 1.5 0 0 0 5.5 16H8" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            Copy
+                        </button>
+                        <button
+                            class="small-button glass-button"
+                            id="saveLogs"
+                            type="button"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M5 4H15L19 8V20H5V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                                <path d="M8 4V9H15V4M8 20V14H16V20" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            Save
+                        </button>
+                        <button
+                            class="small-button danger-soft glass-button"
+                            id="clearTerminal"
+                            type="button"
+                        >
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    class="terminal-output"
+                    id="terminalOutput"
+                    aria-live="polite"
+                ></div>
+
+                <form class="terminal-form" id="terminalForm">
+                    <span class="terminal-prompt">$</span>
+                    <input
+                        id="terminalInput"
+                        type="text"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        placeholder="Enter ADB command..."
+                    >
+                    <button
+                        id="terminalSend"
+                        class="send-button glass-button"
+                        type="submit"
+                        aria-label="Send command"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M4 12H19M13 6L19 12L13 18"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </button>
+                </form>
+            </article>
+
+            <div class="terminal-history glass-panel">
+                <div>
+                    <span class="eyebrow">COMMAND HISTORY</span>
+                    <strong>Recent commands</strong>
+                </div>
+                <span class="history-count" id="historyCount">0</span>
+            </div>
+
+        </section>
+
+        <!-- ================= SETTINGS ================= -->
+        <section class="page" data-page="settings">
+
+            <div class="page-heading">
+                <div>
+                    <span class="eyebrow">PREFERENCES</span>
+                    <h1>Settings</h1>
+                    <p>Customize the application experience.</p>
+                </div>
+            </div>
+
+            <!-- Appearance -->
+            <article class="settings-section glass-panel">
+                <div class="settings-section-title">
+                    <div class="settings-section-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/>
+                            <path
+                                d="M12 2V4M12 20V22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M2 12H4M20 12H22M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </div>
+                    <div>
+                        <strong>Appearance</strong>
+                        <span>Control the visual experience.</span>
+                    </div>
+                </div>
+
+                <div class="theme-selector">
+                    <button
+                        class="theme-choice active glass-button"
+                        data-theme-choice="light"
+                        type="button"
+                    >
+                        <span class="theme-preview light-preview"></span>
+                        <strong>Light</strong>
+                    </button>
+                    <button
+                        class="theme-choice glass-button"
+                        data-theme-choice="dark"
+                        type="button"
+                    >
+                        <span class="theme-preview dark-preview"></span>
+                        <strong>Dark</strong>
+                    </button>
+                    <button
+                        class="theme-choice glass-button"
+                        data-theme-choice="system"
+                        type="button"
+                    >
+                        <span class="theme-preview system-preview"></span>
+                        <strong>System</strong>
+                    </button>
+                </div>
+            </article>
+
+            <!-- Glass -->
+            <article class="setting-row glass-panel">
+                <div class="setting-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M12 3C8.5 7.2 6 10.1 6 14a6 6 0 0 0 12 0c0-3.9-2.5-6.8-6-11Z"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        />
+                    </svg>
+                </div>
+                <div class="setting-copy">
+                    <strong>Liquid Glass</strong>
+                    <span>Enable translucent water-glass surfaces.</span>
+                </div>
+                <button
+                    class="toggle active"
+                    id="glassToggle"
+                    type="button"
+                    aria-label="Toggle liquid glass"
+                    aria-pressed="true"
+                >
+                    <span></span>
+                </button>
+            </article>
+
+            <!-- Motion -->
+            <article class="setting-row glass-panel">
+                <div class="setting-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M4 12H8L10 5L14 19L16 12H20"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </div>
+                <div class="setting-copy">
+                    <strong>Smooth Motion</strong>
+                    <span>Enable premium interface animations.</span>
+                </div>
+                <button
+                    class="toggle active"
+                    id="motionToggle"
+                    type="button"
+                    aria-label="Toggle motion"
+                    aria-pressed="true"
+                >
+                    <span></span>
+                </button>
+            </article>
+
+            <!-- Auto Save -->
+            <article class="setting-row glass-panel">
+                <div class="setting-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M5 5H15L19 9V19H5V5Z"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M8 5V10H15V5M8 19V14H16V19"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        />
+                    </svg>
+                </div>
+                <div class="setting-copy">
+                    <strong>Auto-save Logs</strong>
+                    <span>Keep terminal logs stored locally.</span>
+                </div>
+                <button
+                    class="toggle"
+                    id="autoSaveToggle"
+                    type="button"
+                    aria-label="Toggle auto save logs"
+                    aria-pressed="false"
+                >
+                    <span></span>
+                </button>
+            </article>
+
+            <!-- Data -->
+            <article class="settings-section glass-panel">
+                <div class="settings-section-title">
+                    <div class="settings-section-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M5 6H19M8 6V4H16V6M7 6L8 20H16L17 6M10 10V17M14 10V17"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </div>
+                    <div>
+                        <strong>Application Data</strong>
+                        <span>Manage locally stored application data.</span>
+                    </div>
+                </div>
+
+                <div class="settings-buttons">
+                    <button
+                        class="wide-button glass-button"
+                        id="clearHistory"
+                        type="button"
+                    >
+                        Clear Command History
+                    </button>
+                    <button
+                        class="wide-button reset-button glass-button"
+                        id="resetSettings"
+                        type="button"
+                    >
+                        Reset Settings
+                    </button>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- ================= ABOUT ================= -->
+        <section class="page" data-page="about">
+
+            <div class="page-heading">
+                <div>
+                    <span class="eyebrow">PROJECT</span>
+                    <h1>About</h1>
+                    <p>Information about this ADB utility.</p>
+                </div>
+            </div>
+
+            <article class="about-hero glass-panel">
+                <div class="about-logo">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M7 7.5L4.5 10L7 12.5M17 7.5L19.5 10L17 12.5M14 5L10 15"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </div>
+                <span class="eyebrow">ADB UTILITY</span>
+                <h2>Android Device Control</h2>
+                <p>
+                    A modern mobile-first interface for Android debugging,
+                    device information and ADB operations.
+                </p>
+                <span class="version-badge">Frontend v1.0</span>
+            </article>
+
+            <article class="developer-card glass-panel">
+                <div class="developer-heading">
+                    <div class="developer-avatar">F</div>
+                    <div>
+                        <span class="eyebrow">APPLICATION DEVELOPER</span>
+                        <strong>Muhammad Fahad</strong>
+                    </div>
+                </div>
+                <p>
+                    Application development — architecture, ADB/Fastboot
+                    bridge and overall build of ADB Utility.
+                </p>
+                <a
+                    class="developer-handle"
+                    href="https://t.me/fadiii"
+                    target="_blank"
+                    rel="noopener"
+                >@fadiii · Telegram</a>
+            </article>
+
+            <article class="developer-card glass-panel">
+                <div class="developer-heading">
+                    <div class="developer-avatar">W</div>
+                    <div>
+                        <span class="eyebrow">UI DESIGN</span>
+                        <strong>Muhammad Wasif</strong>
+                    </div>
+                </div>
+                <p>
+                    Interface design and interaction experience for ADB
+                    Utility.
+                </p>
+                <a
+                    class="developer-handle"
+                    href="https://t.me/kindcoder1"
+                    target="_blank"
+                    rel="noopener"
+                >@kindcoder1 · Telegram</a>
+            </article>
+
+            <article class="developer-card glass-panel">
+                <div class="developer-heading">
+                    <div class="developer-avatar">P</div>
+                    <div>
+                        <span class="eyebrow">CONTRIBUTOR</span>
+                        <strong>@pyn_exe</strong>
+                    </div>
+                </div>
+                <p>
+                    Ideas and suggestions that helped shape features of
+                    ADB Utility.
+                </p>
+                <a
+                    class="developer-handle"
+                    href="https://t.me/pyn_exe"
+                    target="_blank"
+                    rel="noopener"
+                >@pyn_exe · Telegram</a>
+            </article>
+
+            <div class="about-note glass-panel">
+                <span>Native integration</span>
+                <p>
+                    This frontend does not fabricate device information or
+                    command results. Real functionality is provided through
+                    the Android native bridge.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-navigation glass-panel">
+        <button
+            class="nav-item active"
+            data-page="home"
+            type="button"
+        >
+            <svg viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M4 11L12 4L20 11V19A1 1 0 0 1 19 20H5A1 1 0 0 1 4 19V11Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                />
+                <path
+                    d="M9 20V14H15V20"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                />
+            </svg>
+            <span>Home</span>
+        </button>
+
+        <button
+            class="nav-item"
+            data-page="terminal"
+            type="button"
+        >
+            <svg viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M4 5H20V19H4V5Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                />
+                <path
+                    d="M7 9L10 12L7 15M12 15H17"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+            </svg>
+            <span>Terminal</span>
+        </button>
+
+        <button
+            class="nav-item"
+            data-page="settings"
+            type="button"
+        >
+            <svg viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M12 15.2A3.2 3.2 0 1 0 12 8.8A3.2 3.2 0 0 0 12 15.2Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                />
+                <path
+                    d="M19 13.5V10.5L17 10L16 8L17 6.2L14.8 4.2L13 5.2L11 4.5L10.5 2.5H7.5L7 4.5L5 5.2L3.2 4.2L1 6.2L2 8L1 10L-1 10.5V13.5L1 14L2 16L1 17.8L3.2 19.8L5 18.8L7 19.5L7.5 21.5H10.5L11 19.5L13 18.8L14.8 19.8L17 17.8L16 16L17 14L19 13.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linejoin="round"
+                    transform="translate(2 0)"
+                />
+            </svg>
+            <span>Settings</span>
+        </button>
+
+        <button
+            class="nav-item"
+            data-page="about"
+            type="button"
+        >
+            <svg viewBox="0 0 24 24" fill="none">
+                <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                />
+                <path
+                    d="M12 11V16"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                />
+                <circle
+                    cx="12"
+                    cy="7.5"
+                    r="1"
+                    fill="currentColor"
+                />
+            </svg>
+            <span>About</span>
+        </button>
+    </nav>
+
+    <!-- Toast Container -->
+    <div
+        class="toast-container"
+        id="toastContainer"
+        aria-live="polite"
+        aria-atomic="true"
+    ></div>
+
+    <script src="bridge.js"></script>
+    <script>
+        /* =========================================================
+   ADB UTILITY
+   Frontend Application Controller
+   ========================================================= */
+
+(function () {
+    "use strict";
+
+
+    /* =====================================================
+       CONSTANTS
+       ===================================================== */
+
+    const STORAGE = {
+        settings: "adb-utility-settings-v2",
+        history: "adb-utility-history-v2",
+        logs: "adb-utility-logs-v2",
+        page: "adb-utility-page-v2"
+    };
+
+    const DEFAULT_SETTINGS = {
+        theme: "light",
+        glass: true,
+        motion: true,
+        autoSaveLogs: false
+    };
+
+    const VALID_PAGES = [
+        "home",
+        "terminal",
+        "settings",
+        "about"
+    ];
+
+
+    /* =====================================================
+       STATE
+       ===================================================== */
+
+    const state = {
+
+        settings: {
+            ...DEFAULT_SETTINGS
+        },
+
+        device: {
+            connected: false,
+            model: "",
+            manufacturer: "",
+            android: "",
+            build: "",
+            serial: "",
+            loading: false
+        },
+
+        terminal: {
+            lines: [],
+            history: [],
+            historyIndex: -1,
+            running: false
+        },
+
+        currentPage: "home",
+
+        operationRunning: false,
+
+        nativeBridge: null
+    };
+
+
+    /* =====================================================
+       DOM
+       ===================================================== */
+
+    const $ = (selector, root = document) =>
+        root.querySelector(selector);
+
+    const $$ = (selector, root = document) =>
+        Array.from(root.querySelectorAll(selector));
+
+
+    /* =====================================================
+       STORAGE HELPERS
+       ===================================================== */
+
+    function readStorage(key, fallback) {
+
+        try {
+            const value = localStorage.getItem(key);
+
+            if (value === null) {
+                return fallback;
+            }
+
+            return JSON.parse(value);
+
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+
+    function writeStorage(key, value) {
+
+        try {
+            localStorage.setItem(
+                key,
+                JSON.stringify(value)
+            );
+
+            return true;
+
+        } catch (error) {
+            return false;
+        }
+    }
+
+
+    function removeStorage(key) {
+
+        try {
+            localStorage.removeItem(key);
+        } catch (error) {
+            /* Ignore storage failures */
+        }
+    }
+
+
+    /* =====================================================
+       SETTINGS
+       ===================================================== */
+
+    function loadSettings() {
+
+        const saved =
+            readStorage(
+                STORAGE.settings,
+                DEFAULT_SETTINGS
+            );
+
+        state.settings = {
+            ...DEFAULT_SETTINGS,
+            ...(saved || {})
+        };
+
+        if (
+            !["light", "dark", "system"]
+                .includes(state.settings.theme)
+        ) {
+            state.settings.theme = "light";
+        }
+
+        applySettings();
+    }
+
+
+    function saveSettings() {
+
+        writeStorage(
+            STORAGE.settings,
+            state.settings
+        );
+    }
+
+
+    function applySettings() {
+
+        const root = document.documentElement;
+
+        root.dataset.theme =
+            state.settings.theme;
+
+        root.dataset.glass =
+            state.settings.glass
+                ? "on"
+                : "off";
+
+        root.dataset.motion =
+            state.settings.motion
+                ? "on"
+                : "off";
+
+        updateSettingsUI();
+    }
+
+
+    function setTheme(theme) {
+
+        if (
+            !["light", "dark", "system"]
+                .includes(theme)
+        ) {
+            return;
+        }
+
+        state.settings.theme = theme;
+
+        saveSettings();
+        applySettings();
+
+        showToast(
+            `Theme changed to ${capitalize(theme)}.`
+        );
+    }
+
+
+    function setGlass(enabled) {
+
+        state.settings.glass =
+            Boolean(enabled);
+
+        saveSettings();
+        applySettings();
+
+        showToast(
+            state.settings.glass
+                ? "Liquid Glass enabled."
+                : "Liquid Glass disabled."
+        );
+    }
+
+
+    function setMotion(enabled) {
+
+        state.settings.motion =
+            Boolean(enabled);
+
+        saveSettings();
+        applySettings();
+
+        showToast(
+            state.settings.motion
+                ? "Smooth motion enabled."
+                : "Smooth motion disabled."
+        );
+    }
+
+
+    function setAutoSave(enabled) {
+
+        state.settings.autoSaveLogs =
+            Boolean(enabled);
+
+        saveSettings();
+        updateSettingsUI();
+
+        showToast(
+            state.settings.autoSaveLogs
+                ? "Automatic log saving enabled."
+                : "Automatic log saving disabled."
+        );
+    }
+
+
+    function updateSettingsUI() {
+
+        $$("[data-theme-choice]")
+            .forEach(button => {
+
+                const active =
+                    button.dataset.themeChoice ===
+                    state.settings.theme;
+
+                button.classList.toggle(
+                    "active",
+                    active
+                );
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(active)
+                );
+            });
+
+
+        updateToggle(
+            $("#glassToggle"),
+            state.settings.glass
+        );
+
+        updateToggle(
+            $("#motionToggle"),
+            state.settings.motion
+        );
+
+        updateToggle(
+            $("#autoSaveToggle"),
+            state.settings.autoSaveLogs
+        );
+    }
+
+
+    function updateToggle(element, enabled) {
+
+        if (!element) {
+            return;
+        }
+
+        element.classList.toggle(
+            "active",
+            Boolean(enabled)
+        );
+
+        element.setAttribute(
+            "aria-pressed",
+            String(Boolean(enabled))
+        );
+    }
+
+
+    function resetSettings() {
+
+        state.settings = {
+            ...DEFAULT_SETTINGS
+        };
+
+        saveSettings();
+        applySettings();
+
+        showToast(
+            "Settings restored to defaults."
+        );
+    }
+
+
+    /* =====================================================
+       NAVIGATION
+       ===================================================== */
+
+    function navigate(page, updateHash = true) {
+
+        if (!VALID_PAGES.includes(page)) {
+            page = "home";
+        }
+
+        state.currentPage = page;
+
+        $$(".page").forEach(section => {
+
+            section.classList.toggle(
+                "active",
+                section.dataset.page === page
+            );
+        });
+
+
+        $$(".nav-item").forEach(item => {
+
+            item.classList.toggle(
+                "active",
+                item.dataset.page === page
+            );
+        });
+
+
+        if (updateHash) {
+
+            try {
+                history.replaceState(
+                    null,
+                    "",
+                    `#${page}`
+                );
+            } catch (error) {
+                /* Ignore */
+            }
+        }
+
+        writeStorage(
+            STORAGE.page,
+            page
+        );
+
+        window.scrollTo({
+            top: 0,
+            behavior:
+                state.settings.motion
+                    ? "smooth"
+                    : "auto"
+        });
+    }
+
+
+    function initializeNavigation() {
+
+        $$(".nav-item[data-page]")
+            .forEach(item => {
+
+                item.addEventListener(
+                    "click",
+                    () => {
+
+                        navigate(
+                            item.dataset.page
+                        );
+                    }
+                );
+            });
+
+
+        window.addEventListener(
+            "hashchange",
+            () => {
+
+                const page =
+                    location.hash
+                        .replace("#", "");
+
+                navigate(
+                    VALID_PAGES.includes(page)
+                        ? page
+                        : "home",
+                    false
+                );
+            }
+        );
+
+
+        let initialPage =
+            location.hash
+                .replace("#", "");
+
+        if (
+            !VALID_PAGES.includes(initialPage)
+        ) {
+            initialPage =
+                readStorage(
+                    STORAGE.page,
+                    "home"
+                );
+        }
+
+        navigate(
+            VALID_PAGES.includes(initialPage)
+                ? initialPage
+                : "home",
+            false
+        );
+    }
+
+
+    /* =====================================================
+       NATIVE BRIDGE
+       ===================================================== */
+
+    function findNativeBridge() {
+
+        if (
+            window.ADBBridge &&
+            typeof window.ADBBridge === "object"
+        ) {
+            state.nativeBridge =
+                window.ADBBridge;
+
+            return state.nativeBridge;
+        }
+
+        state.nativeBridge = null;
+
+        return null;
+    }
+
+
+    function bridgeAvailable() {
+
+        return Boolean(
+            findNativeBridge()
+        );
+    }
+
+
+    function normalizeDeviceInfo(raw) {
+
+        if (!raw || typeof raw !== "object") {
+            return null;
+        }
+
+        return {
+            connected:
+                Boolean(
+                    raw.connected ??
+                    raw.isConnected ??
+                    raw.deviceConnected
+                ),
+
+            model:
+                String(
+                    raw.model ??
+                    raw.deviceModel ??
+                    ""
+                ),
+
+            manufacturer:
+                String(
+                    raw.manufacturer ??
+                    raw.brand ??
+                    ""
+                ),
+
+            android:
+                String(
+                    raw.android ??
+                    raw.androidVersion ??
+                    raw.version ??
+                    ""
+                ),
+
+            build:
+                String(
+                    raw.build ??
+                    raw.buildId ??
+                    raw.buildNumber ??
+                    ""
+                ),
+
+            serial:
+                String(
+                    raw.serial ??
+                    raw.serialNumber ??
+                    ""
+                )
+        };
+    }
+
+
+    async function refreshDevice() {
+
+        const bridge =
+            findNativeBridge();
+
+        if (
+            !bridge ||
+            typeof bridge.getDeviceInfo !== "function"
+        ) {
+            state.device = {
+                connected: false,
+                model: "",
+                manufacturer: "",
+                android: "",
+                build: "",
+                serial: "",
+                loading: false
+            };
+
+            updateDeviceUI();
+
+            updateTerminalBridgeStatus();
+
+            return;
+        }
+
+
+        state.device.loading = true;
+
+        updateDeviceUI();
+
+
+        try {
+
+            const result =
+                await bridge.getDeviceInfo();
+
+            const device =
+                normalizeDeviceInfo(result);
+
+            if (device) {
+
+                state.device = {
+                    ...device,
+                    loading: false
+                };
+
+            } else {
+
+                state.device = {
+                    connected: false,
+                    model: "",
+                    manufacturer: "",
+                    android: "",
+                    build: "",
+                    serial: "",
+                    loading: false
+                };
+            }
+
+        } catch (error) {
+
+            state.device = {
+                connected: false,
+                model: "",
+                manufacturer: "",
+                android: "",
+                build: "",
+                serial: "",
+                loading: false
+            };
+
+            addTerminalLine(
+                "Native bridge error: " +
+                getErrorMessage(error),
+                "error"
+            );
+
+        }
+
+        updateDeviceUI();
+        updateTerminalBridgeStatus();
+        updateActionAvailability();
+    }
+
+
+    function updateDeviceUI() {
+
+        const indicator =
+            $("#connectionIndicator");
+
+        const connectionText =
+            $("#connectionText");
+
+        const deviceState =
+            $("#deviceState");
+
+        const deviceName =
+            $("#deviceName");
+
+        const deviceModel =
+            $("#deviceModel");
+
+        const infoModel =
+            $("#infoModel");
+
+        const infoAndroid =
+            $("#infoAndroid");
+
+        const infoBuild =
+            $("#infoBuild");
+
+        const infoSerial =
+            $("#infoSerial");
+
+
+        if (!state.device.connected) {
+
+            if (indicator) {
+                indicator.classList.remove(
+                    "connected"
+                );
+            }
+
+            if (connectionText) {
+                connectionText.textContent =
+                    bridgeAvailable()
+                        ? "Device Offline"
+                        : "Bridge Offline";
+            }
+
+            if (deviceState) {
+                deviceState.textContent =
+                    "NOT CONNECTED";
+            }
+
+            if (deviceName) {
+                deviceName.textContent =
+                    "No device detected";
+            }
+
+            if (deviceModel) {
+                deviceModel.textContent =
+                    bridgeAvailable()
+                        ? "Connect an Android device to begin."
+                        : "Native Android bridge is not available.";
+            }
+
+            if (infoModel) infoModel.textContent = "—";
+            if (infoAndroid) infoAndroid.textContent = "—";
+            if (infoBuild) infoBuild.textContent = "—";
+            if (infoSerial) infoSerial.textContent = "—";
+
+            return;
+        }
+
+
+        if (indicator) {
+            indicator.classList.add(
+                "connected"
+            );
+        }
+
+        if (connectionText) {
+            connectionText.textContent =
+                "Device Connected";
+        }
+
+        if (deviceState) {
+            deviceState.textContent =
+                "CONNECTED";
+        }
+
+        const displayName =
+            state.device.model ||
+            state.device.manufacturer ||
+            "Android Device";
+
+        if (deviceName) {
+            deviceName.textContent =
+                displayName;
+        }
+
+        if (deviceModel) {
+
+            const manufacturer =
+                state.device.manufacturer;
+
+            deviceModel.textContent =
+                manufacturer &&
+                manufacturer !== displayName
+                    ? manufacturer
+                    : "Android device";
+        }
+
+        if (infoModel) {
+            infoModel.textContent =
+                state.device.model || "—";
+        }
+
+        if (infoAndroid) {
+            infoAndroid.textContent =
+                state.device.android || "—";
+        }
+
+        if (infoBuild) {
+            infoBuild.textContent =
+                state.device.build || "—";
+        }
+
+        if (infoSerial) {
+            infoSerial.textContent =
+                state.device.serial || "—";
+        }
+    }
+
+
+    function updateActionAvailability() {
+
+        const available =
+            Boolean(
+                state.device.connected &&
+                bridgeAvailable() &&
+                !state.operationRunning
+            );
+
+        $$(".action-card[data-operation]")
+            .forEach(button => {
+
+                button.disabled =
+                    !available;
+
+                button.setAttribute(
+                    "aria-disabled",
+                    String(!available)
+                );
+            });
+    }
+
+
+    function updateTerminalBridgeStatus() {
+
+        const status =
+            $("#terminalDisconnected");
+
+        const led =
+            $(".terminal-led");
+
+        if (!status) {
+            return;
+        }
+
+        if (
+            bridgeAvailable() &&
+            state.device.connected
+        ) {
+
+            status.textContent =
+                "ADB bridge connected";
+
+            if (led) {
+                led.style.background =
+                    "#10b981";
+            }
+
+        } else if (bridgeAvailable()) {
+
+            status.textContent =
+                "Bridge ready · device offline";
+
+            if (led) {
+                led.style.background =
+                    "#f59e0b";
+            }
+
+        } else {
+
+            status.textContent =
+                "Native bridge unavailable";
+
+            if (led) {
+                led.style.background =
+                    "#6b7280";
+            }
+        }
+    }
+
+
+    /* =====================================================
+       DEVICE OPERATIONS
+       ===================================================== */
+
+    async function performOperation(operation) {
+
+        if (state.operationRunning) {
+            return;
+        }
+
+        if (!bridgeAvailable()) {
+
+            showToast(
+                "Native Android bridge is unavailable."
+            );
+
+            addTerminalLine(
+                "Operation blocked: native bridge unavailable.",
+                "error"
+            );
+
+            return;
+        }
+
+        if (!state.device.connected) {
+
+            showToast(
+                "No Android device is connected."
+            );
+
+            addTerminalLine(
+                "Operation blocked: no connected device.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const bridge =
+            state.nativeBridge;
+
+        const methodMap = {
+            reboot: "reboot",
+            bootloader: "rebootBootloader",
+            recovery: "rebootRecovery"
+        };
+
+        const method =
+            methodMap[operation];
+
+        if (
+            !method ||
+            typeof bridge[method] !== "function"
+        ) {
+
+            showToast(
+                "This operation is not implemented by the native bridge."
+            );
+
+            addTerminalLine(
+                `Native bridge method missing: ${method || operation}`,
+                "error"
+            );
+
+            return;
+        }
+
+
+        state.operationRunning = true;
+
+        updateActionAvailability();
+
+        setOperationUI(
+            capitalize(operation),
+            "RUNNING",
+            15,
+            "running"
+        );
+
+
+        addTerminalLine(
+            `Executing ${operation}...`,
+            "command"
+        );
+
+
+        try {
+
+            setOperationUI(
+                capitalize(operation),
+                "RUNNING",
+                45,
+                "running"
+            );
+
+
+            const result =
+                await bridge[method]();
+
+
+            setOperationUI(
+                capitalize(operation),
+                "SUCCESS",
+                100,
+                "success"
+            );
+
+
+            addTerminalLine(
+                formatBridgeResult(result),
+                "output"
+            );
+
+
+            showToast(
+                `${capitalize(operation)} command sent.`
+            );
+
+
+            if (
+                state.settings.autoSaveLogs
+            ) {
+                saveLogsToStorage();
+            }
+
+
+        } catch (error) {
+
+            setOperationUI(
+                "Operation failed",
+                "ERROR",
+                100,
+                "error"
+            );
+
+
+            const message =
+                getErrorMessage(error);
+
+            addTerminalLine(
+                message,
+                "error"
+            );
+
+
+            showToast(
+                "The operation could not be completed."
+            );
+
+        }
+
+
+        state.operationRunning = false;
+
+        updateActionAvailability();
+
+
+        setTimeout(
+            () => {
+
+                if (!state.operationRunning) {
+
+                    setOperationUI(
+                        "Ready",
+                        "IDLE",
+                        0,
+                        ""
+                    );
+                }
+
+            },
+            1800
+        );
+    }
+
+
+    function setOperationUI(
+        status,
+        badge,
+        progress,
+        type
+    ) {
+
+        const statusElement =
+            $("#operationStatus");
+
+        const badgeElement =
+            $("#operationBadge");
+
+        const progressElement =
+            $("#operationProgress");
+
+
+        if (statusElement) {
+            statusElement.textContent =
+                status;
+        }
+
+        if (badgeElement) {
+
+            badgeElement.textContent =
+                badge;
+
+            badgeElement.className =
+                "operation-badge";
+
+            if (type) {
+                badgeElement.classList.add(
+                    type
+                );
+            }
+        }
+
+        if (progressElement) {
+            progressElement.style.width =
+                `${Math.max(0, Math.min(100, progress))}%`;
+        }
+    }
+
+
+    function formatBridgeResult(result) {
+
+        if (result === undefined) {
+            return "Native bridge completed the request.";
+        }
+
+        if (typeof result === "string") {
+            return result;
+        }
+
+        if (
+            typeof result === "object" &&
+            result !== null
+        ) {
+
+            if (result.message) {
+                return String(result.message);
+            }
+
+            if (result.stdout) {
+                return String(result.stdout);
+            }
+
+            return JSON.stringify(
+                result,
+                null,
+                2
+            );
+        }
+
+        return String(result);
+    }
+
+
+    /* =====================================================
+       TERMINAL
+       ===================================================== */
+
+    function loadTerminalData() {
+
+        state.terminal.history =
+            readStorage(
+                STORAGE.history,
+                []
+            );
+
+        state.terminal.lines =
+            readStorage(
+                STORAGE.logs,
+                []
+            );
+
+        if (
+            !Array.isArray(
+                state.terminal.history
+            )
+        ) {
+            state.terminal.history = [];
+        }
+
+        if (
+            !Array.isArray(
+                state.terminal.lines
+            )
+        ) {
+            state.terminal.lines = [];
+        }
+
+        state.terminal.historyIndex = -1;
+
+        renderTerminal();
+
+        updateHistoryCount();
+    }
+
+
+    function addTerminalLine(
+        text,
+        type = "output"
+    ) {
+
+        const timestamp =
+            new Date().toLocaleTimeString(
+                [],
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                }
+            );
+
+        const line = {
+            time: timestamp,
+            text: String(text ?? ""),
+            type
+        };
+
+        state.terminal.lines.push(line);
+
+
+        if (
+            state.terminal.lines.length >
+            2000
+        ) {
+            state.terminal.lines =
+                state.terminal.lines.slice(
+                    -2000
+                );
+        }
+
+
+        renderTerminal();
+
+
+        if (
+            state.settings.autoSaveLogs
+        ) {
+            saveLogsToStorage();
+        }
+    }
+
+
+    function renderTerminal() {
+
+        const output =
+            $("#terminalOutput");
+
+        if (!output) {
+            return;
+        }
+
+
+        if (
+            state.terminal.lines.length === 0
+        ) {
+
+            output.innerHTML =
+                '<div class="terminal-line system">ADB Utility terminal ready.</div>';
+
+            return;
+        }
+
+
+        const fragment =
+            document.createDocumentFragment();
+
+
+        state.terminal.lines
+            .forEach(line => {
+
+                const div =
+                    document.createElement("div");
+
+                div.className =
+                    `terminal-line ${line.type || "output"}`;
+
+                div.textContent =
+                    `[${line.time}] ${line.text}`;
+
+                fragment.appendChild(div);
+            });
+
+
+        output.innerHTML = "";
+
+        output.appendChild(
+            fragment
+        );
+
+
+        output.scrollTop =
+            output.scrollHeight;
+    }
+
+
+    async function executeCommand(
+        command
+    ) {
+
+        const cleanCommand =
+            String(command || "").trim();
+
+        if (!cleanCommand) {
+            return;
+        }
+
+        if (state.terminal.running) {
+            return;
+        }
+
+
+        state.terminal.history =
+            state.terminal.history
+                .filter(
+                    item =>
+                        item !== cleanCommand
+                );
+
+        state.terminal.history
+            .push(cleanCommand);
+
+
+        if (
+            state.terminal.history.length >
+            100
+        ) {
+            state.terminal.history =
+                state.terminal.history.slice(
+                    -100
+                );
+        }
+
+
+        state.terminal.historyIndex = -1;
+
+        writeStorage(
+            STORAGE.history,
+            state.terminal.history
+        );
+
+        updateHistoryCount();
+
+
+        addTerminalLine(
+            `$ ${cleanCommand}`,
+            "command"
+        );
+
+
+        if (!bridgeAvailable()) {
+
+            addTerminalLine(
+                "Native Android bridge is unavailable.",
+                "error"
+            );
+
+            showToast(
+                "Connect the native ADB bridge first."
+            );
+
+            return;
+        }
+
+
+        if (!state.device.connected) {
+
+            addTerminalLine(
+                "No Android device is connected.",
+                "error"
+            );
+
+            showToast(
+                "No Android device is connected."
+            );
+
+            return;
+        }
+
+
+        const bridge =
+            state.nativeBridge;
+
+
+        if (
+            typeof bridge.executeCommand !==
+            "function"
+        ) {
+
+            addTerminalLine(
+                "ADBBridge.executeCommand() is not implemented.",
+                "error"
+            );
+
+            showToast(
+                "Terminal bridge method is unavailable."
+            );
+
+            return;
+        }
+
+
+        state.terminal.running = true;
+
+        const sendButton =
+            $("#terminalSend");
+
+        if (sendButton) {
+            sendButton.disabled = true;
+        }
+
+
+        try {
+
+            const result =
+                await bridge.executeCommand({
+                    command:
+                        cleanCommand
+                });
+
+
+            if (
+                result &&
+                typeof result === "object"
+            ) {
+
+                if (result.stdout) {
+
+                    addTerminalLine(
+                        String(result.stdout),
+                        "output"
+                    );
+                }
+
+                if (result.stderr) {
+
+                    addTerminalLine(
+                        String(result.stderr),
+                        "error"
+                    );
+                }
+
+                if (
+                    result.exitCode !==
+                    undefined
+                ) {
+
+                    addTerminalLine(
+                        `Exit code: ${result.exitCode}`,
+                        result.exitCode === 0
+                            ? "system"
+                            : "error"
+                    );
+                }
+
+            } else {
+
+                addTerminalLine(
+                    formatBridgeResult(result),
+                    "output"
+                );
+            }
+
+
+        } catch (error) {
+
+            addTerminalLine(
+                getErrorMessage(error),
+                "error"
+            );
+
+        } finally {
+
+            state.terminal.running = false;
+
+            if (sendButton) {
+                sendButton.disabled = false;
+            }
+        }
+    }
+
+
+    function handleTerminalInputKeydown(
+        event
+    ) {
+
+        const input =
+            event.currentTarget;
+
+        if (event.key === "ArrowUp") {
+
+            event.preventDefault();
+
+            if (
+                state.terminal.history.length ===
+                0
+            ) {
+                return;
+            }
+
+
+            if (
+                state.terminal.historyIndex <
+                0
+            ) {
+                state.terminal.historyIndex =
+                    state.terminal.history.length;
+            }
+
+
+            state.terminal.historyIndex =
+                Math.max(
+                    0,
+                    state.terminal.historyIndex - 1
+                );
+
+
+            input.value =
+                state.terminal.history[
+                    state.terminal.historyIndex
+                ] || "";
+
+
+            setTimeout(
+                () => input.setSelectionRange(
+                    input.value.length,
+                    input.value.length
+                ),
+                0
+            );
+        }
+
+
+        if (event.key === "ArrowDown") {
+
+            event.preventDefault();
+
+            if (
+                state.terminal.history.length ===
+                0
+            ) {
+                return;
+            }
+
+
+            state.terminal.historyIndex =
+                Math.min(
+                    state.terminal.history.length,
+                    state.terminal.historyIndex + 1
+                );
+
+
+            if (
+                state.terminal.historyIndex >=
+                state.terminal.history.length
+            ) {
+                input.value = "";
+            } else {
+                input.value =
+                    state.terminal.history[
+                        state.terminal.historyIndex
+                    ] || "";
+            }
+        }
+    }
+
+
+    async function copyLogs() {
+
+        const text =
+            terminalText();
+
+
+        if (!text) {
+
+            showToast(
+                "There are no logs to copy."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            if (
+                navigator.clipboard &&
+                navigator.clipboard.writeText
+            ) {
+
+                await navigator.clipboard.writeText(
+                    text
+                );
+
+            } else {
+
+                fallbackCopy(text);
+            }
+
+
+            showToast(
+                "Terminal logs copied."
+            );
+
+        } catch (error) {
+
+            showToast(
+                "Unable to copy logs."
+            );
+        }
+    }
+
+
+    function fallbackCopy(text) {
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = text;
+
+        textarea.style.position =
+            "fixed";
+
+        textarea.style.opacity =
+            "0";
+
+        document.body.appendChild(
+            textarea
+        );
+
+        textarea.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+        textarea.remove();
+    }
+
+
+    function terminalText() {
+
+        return state.terminal.lines
+            .map(
+                line =>
+                    `[${line.time}] ${line.text}`
+            )
+            .join("\n");
+    }
+
+
+    function saveLogs() {
+
+        const text =
+            terminalText();
+
+
+        if (!text) {
+
+            showToast(
+                "There are no logs to save."
+            );
+
+            return;
+        }
+
+
+        const blob =
+            new Blob(
+                [text],
+                {
+                    type:
+                        "text/plain;charset=utf-8"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const anchor =
+            document.createElement("a");
+
+        anchor.href = url;
+
+        anchor.download =
+            `adb-logs-${fileTimestamp()}.txt`;
+
+        document.body.appendChild(
+            anchor
+        );
+
+        anchor.click();
+
+        anchor.remove();
+
+        URL.revokeObjectURL(url);
+
+
+        showToast(
+            "Logs saved."
+        );
+    }
+
+
+    function saveLogsToStorage() {
+
+        writeStorage(
+            STORAGE.logs,
+            state.terminal.lines
+        );
+    }
+
+
+    function clearTerminal() {
+
+        state.terminal.lines = [];
+
+        removeStorage(
+            STORAGE.logs
+        );
+
+        renderTerminal();
+
+        showToast(
+            "Terminal cleared."
+        );
+    }
+
+
+    function clearHistory() {
+
+        state.terminal.history = [];
+
+        state.terminal.historyIndex = -1;
+
+        removeStorage(
+            STORAGE.history
+        );
+
+        updateHistoryCount();
+
+        showToast(
+            "Command history cleared."
+        );
+    }
+
+
+    function updateHistoryCount() {
+
+        const element =
+            $("#historyCount");
+
+        if (!element) {
+            return;
+        }
+
+        element.textContent =
+            String(
+                state.terminal.history.length
+            );
+    }
+
+
+    /* =====================================================
+       AUTO-SAVE
+       ===================================================== */
+
+    function initializeAutoSave() {
+
+        window.addEventListener(
+            "beforeunload",
+            () => {
+
+                if (
+                    state.settings.autoSaveLogs
+                ) {
+                    saveLogsToStorage();
+                }
+            }
+        );
+    }
+
+
+    /* =====================================================
+       NATIVE EVENTS
+       ===================================================== */
+
+    function connectNativeEvents() {
+
+        const bridge =
+            findNativeBridge();
+
+        if (!bridge) {
+            return;
+        }
+
+
+        if (
+            typeof bridge.on ===
+            "function"
+        ) {
+
+            try {
+
+                bridge.on(
+                    "deviceChanged",
+                    payload => {
+
+                        handleDeviceEvent(
+                            payload
+                        );
+                    }
+                );
+
+                bridge.on(
+                    "deviceConnected",
+                    payload => {
+
+                        handleDeviceEvent(
+                            payload
+                        );
+                    }
+                );
+
+                bridge.on(
+                    "deviceDisconnected",
+                    () => {
+
+                        state.device = {
+                            connected: false,
+                            model: "",
+                            manufacturer: "",
+                            android: "",
+                            build: "",
+                            serial: "",
+                            loading: false
+                        };
+
+                        updateDeviceUI();
+                        updateActionAvailability();
+                        updateTerminalBridgeStatus();
+
+                        addTerminalLine(
+                            "Android device disconnected.",
+                            "system"
+                        );
+                    }
+                );
+
+            } catch (error) {
+                /* Optional native events */
+            }
+        }
+    }
+
+
+    function handleDeviceEvent(
+        payload
+    ) {
+
+        const device =
+            normalizeDeviceInfo(
+                payload
+            );
+
+        if (!device) {
+            refreshDevice();
+            return;
+        }
+
+        state.device = {
+            ...device,
+            loading: false
+        };
+
+        updateDeviceUI();
+        updateActionAvailability();
+        updateTerminalBridgeStatus();
+
+        addTerminalLine(
+            device.connected
+                ? "Android device connected."
+                : "Android device disconnected.",
+            "system"
+        );
+    }
+
+
+    /* =====================================================
+       UI EVENTS
+       ===================================================== */
+
+    function initializeUIEvents() {
+
+        /* Refresh */
+
+        const refresh =
+            $("#refreshDevice");
+
+        if (refresh) {
+
+            refresh.addEventListener(
+                "click",
+                async () => {
+
+                    refresh.disabled = true;
+
+                    await refreshDevice();
+
+                    setTimeout(
+                        () => {
+                            refresh.disabled = false;
+                        },
+                        300
+                    );
+                }
+            );
+        }
+
+
+        /* Operations */
+
+        $$(".action-card[data-operation]")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        performOperation(
+                            button.dataset.operation
+                        );
+                    }
+                );
+            });
+
+
+        /* Theme */
+
+        $$("[data-theme-choice]")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        setTheme(
+                            button.dataset.themeChoice
+                        );
+                    }
+                );
+            });
+
+
+        /* Glass */
+
+        const glass =
+            $("#glassToggle");
+
+        if (glass) {
+
+            glass.addEventListener(
+                "click",
+                () => {
+
+                    setGlass(
+                        !state.settings.glass
+                    );
+                }
+            );
+        }
+
+
+        /* Motion */
+
+        const motion =
+            $("#motionToggle");
+
+        if (motion) {
+
+            motion.addEventListener(
+                "click",
+                () => {
+
+                    setMotion(
+                        !state.settings.motion
+                    );
+                }
+            );
+        }
+
+
+        /* Auto-save */
+
+        const autoSave =
+            $("#autoSaveToggle");
+
+        if (autoSave) {
+
+            autoSave.addEventListener(
+                "click",
+                () => {
+
+                    setAutoSave(
+                        !state.settings.autoSaveLogs
+                    );
+                }
+            );
+        }
+
+
+        /* Clear history */
+
+        const clearHistoryButton =
+            $("#clearHistory");
+
+        if (clearHistoryButton) {
+
+            clearHistoryButton.addEventListener(
+                "click",
+                clearHistory
+            );
+        }
+
+
+        /* Reset settings */
+
+        const resetButton =
+            $("#resetSettings");
+
+        if (resetButton) {
+
+            resetButton.addEventListener(
+                "click",
+                () => {
+
+                    resetSettings();
+                }
+            );
+        }
+
+
+        /* Copy */
+
+        const copy =
+            $("#copyLogs");
+
+        if (copy) {
+
+            copy.addEventListener(
+                "click",
+                copyLogs
+            );
+        }
+
+
+        /* Save */
+
+        const save =
+            $("#saveLogs");
+
+        if (save) {
+
+            save.addEventListener(
+                "click",
+                saveLogs
+            );
+        }
+
+
+        /* Clear terminal */
+
+        const clearTerminalButton =
+            $("#clearTerminal");
+
+        if (clearTerminalButton) {
+
+            clearTerminalButton.addEventListener(
+                "click",
+                clearTerminal
+            );
+        }
+
+
+        /* Terminal form */
+
+        const terminalForm =
+            $("#terminalForm");
+
+        if (terminalForm) {
+
+            terminalForm.addEventListener(
+                "submit",
+                async event => {
+
+                    event.preventDefault();
+
+                    const input =
+                        $("#terminalInput");
+
+                    if (!input) {
+                        return;
+                    }
+
+                    const command =
+                        input.value.trim();
+
+                    if (!command) {
+                        return;
+                    }
+
+                    input.value = "";
+
+                    await executeCommand(
+                        command
+                    );
+
+                    input.focus();
+                }
+            );
+        }
+
+
+        /* Terminal history */
+
+        const terminalInput =
+            $("#terminalInput");
+
+        if (terminalInput) {
+
+            terminalInput.addEventListener(
+                "keydown",
+                handleTerminalInputKeydown
+            );
+        }
+    }
+
+
+    /* =====================================================
+       TOAST
+       ===================================================== */
+
+    function showToast(
+        message,
+        duration = 2400
+    ) {
+
+        const container =
+            $("#toastContainer");
+
+        if (!container) {
+            return;
+        }
+
+
+        const toast =
+            document.createElement("div");
+
+        toast.className =
+            "toast";
+
+        toast.textContent =
+            String(message);
+
+
+        container.appendChild(
+            toast
+        );
+
+
+        window.setTimeout(
+            () => {
+
+                toast.classList.add(
+                    "hide"
+                );
+
+                window.setTimeout(
+                    () => {
+                        toast.remove();
+                    },
+                    200
+                );
+
+            },
+            duration
+        );
+    }
+
+
+    /* =====================================================
+       HELPERS
+       ===================================================== */
+
+    function capitalize(value) {
+
+        const text =
+            String(value || "");
+
+        return text
+            .charAt(0)
+            .toUpperCase() +
+            text.slice(1);
+    }
+
+
+    function getErrorMessage(error) {
+
+        if (!error) {
+            return "Unknown native bridge error.";
+        }
+
+        if (
+            typeof error === "string"
+        ) {
+            return error;
+        }
+
+        if (
+            error.message
+        ) {
+            return String(
+                error.message
+            );
+        }
+
+        try {
+            return JSON.stringify(
+                error
+            );
+        } catch (jsonError) {
+            return "Unknown native bridge error.";
+        }
+    }
+
+
+    function fileTimestamp() {
+
+        const date =
+            new Date();
+
+        const pad =
+            number =>
+                String(number)
+                    .padStart(2, "0");
+
+        return [
+            date.getFullYear(),
+            pad(date.getMonth() + 1),
+            pad(date.getDate())
+        ].join("-") +
+        "_" +
+        [
+            pad(date.getHours()),
+            pad(date.getMinutes()),
+            pad(date.getSeconds())
+        ].join("-");
+    }
+
+
+    /* =====================================================
+       BRIDGE DETECTION
+       ===================================================== */
+
+    function initializeBridgeDetection() {
+
+        refreshDevice();
+        connectNativeEvents();
+
+
+        window.setTimeout(
+            () => {
+
+                if (bridgeAvailable()) {
+
+                    connectNativeEvents();
+                    refreshDevice();
+                }
+
+            },
+            100
+        );
+
+
+        window.setTimeout(
+            () => {
+
+                if (bridgeAvailable()) {
+
+                    connectNativeEvents();
+                    refreshDevice();
+
+                } else {
+
+                    updateDeviceUI();
+                    updateActionAvailability();
+                    updateTerminalBridgeStatus();
+                }
+
+            },
+            1500
+        );
+
+
+        window.setInterval(
+            () => {
+
+                if (!state.device.connected) {
+
+                    if (bridgeAvailable()) {
+                        refreshDevice();
+                    }
+
+                }
+
+            },
+            5000
+        );
+    }
+
+
+    /* =====================================================
+       GLOBAL API
+       ===================================================== */
+
+    window.ADBUtility = {
+
+        navigate,
+
+        refreshDevice,
+
+        reboot: () =>
+            performOperation("reboot"),
+
+        rebootBootloader: () =>
+            performOperation("bootloader"),
+
+        rebootRecovery: () =>
+            performOperation("recovery"),
+
+        executeCommand,
+
+        copyLogs,
+
+        saveLogs,
+
+        clearTerminal,
+
+        clearHistory,
+
+        resetSettings,
+
+        getState: () => ({
+            settings: {
+                ...state.settings
+            },
+
+            device: {
+                ...state.device
+            },
+
+            currentPage:
+                state.currentPage
+        })
+    };
+
+
+    /* =====================================================
+       INITIALIZATION
+       ===================================================== */
+
+    function initializeApp() {
+
+        loadSettings();
+
+        loadTerminalData();
+
+        initializeNavigation();
+
+        initializeUIEvents();
+
+        initializeAutoSave();
+
+        updateDeviceUI();
+
+        updateActionAvailability();
+
+        updateTerminalBridgeStatus();
+
+        initializeBridgeDetection();
+
+
+        if (
+            state.terminal.lines.length === 0
+        ) {
+
+            addTerminalLine(
+                "ADB Utility terminal ready.",
+                "system"
+            );
+
+            addTerminalLine(
+                "Waiting for native Android bridge...",
+                "system"
+            );
+        }
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initializeApp,
+            {
+                once: true
+            }
+        );
+
+    } else {
+
+        initializeApp();
+    }
+
+
+    /* =====================================================
+       OTG BRIDGE (target device connected over USB OTG)
+       ===================================================== */
+    (function setupOtgModule() {
+        const otgState = { mode: "none", connected: false };
+
+        function otgToggleUI() {
+            const connectBtn = $("#otgConnectButton");
+            const statusPill = $("#otgStatusPill");
+            const fastbootActions = $("#otgFastbootActions");
+            const logActions = $("#otgLogActions");
+
+            if (statusPill) {
+                statusPill.textContent = otgState.connected
+                    ? (otgState.mode === "fastboot" ? "FASTBOOT CONNECTED" : "ADB CONNECTED")
+                    : "NOT CONNECTED";
+            }
+            if (connectBtn) {
+                connectBtn.textContent = otgState.connected ? "Disconnect" : "Connect via OTG";
+            }
+            if (fastbootActions) {
+                fastbootActions.style.display = otgState.mode === "fastboot" ? "flex" : "none";
+            }
+            if (logActions) {
+                logActions.style.display = otgState.mode === "adb" ? "flex" : "none";
+            }
+        }
+
+        async function otgConnect() {
+            if (!window.ADBBridge || typeof window.ADBBridge.usbConnect !== "function") {
+                showToast("OTG bridge unavailable.");
+                return;
+            }
+            navigate("terminal");
+            addTerminalLine("Looking for a device on USB OTG...", "system");
+            try {
+                const result = await window.ADBBridge.usbConnect();
+                otgState.connected = !!(result && result.connected);
+                otgState.mode = (result && result.mode) || "none";
+                addTerminalLine(
+                    otgState.connected
+                        ? `Connected to target device (${otgState.mode}).`
+                        : "Could not connect.",
+                    otgState.connected ? "output" : "error"
+                );
+                showToast(otgState.connected ? "OTG device connected" : "OTG connect failed");
+            } catch (err) {
+                otgState.connected = false;
+                otgState.mode = "none";
+                addTerminalLine(`OTG connect failed: ${err.message || err}`, "error");
+                showToast("OTG connect failed");
+            }
+            otgToggleUI();
+        }
+
+        async function otgDisconnect() {
+            if (window.ADBBridge && typeof window.ADBBridge.usbDisconnect === "function") {
+                try { await window.ADBBridge.usbDisconnect(); } catch (e) { /* ignore */ }
+            }
+            otgState.connected = false;
+            otgState.mode = "none";
+            addTerminalLine("Disconnected from target device.", "system");
+            otgToggleUI();
+        }
+
+        async function otgExecuteShell(command) {
+            addTerminalLine(`$ ${command}`, "command");
+            try {
+                const result = await window.ADBBridge.usbShell({ command });
+                if (result && result.stdout) {
+                    addTerminalLine(String(result.stdout), "output");
+                }
+                if (result && typeof result.exitCode === "number" && result.exitCode !== 0) {
+                    addTerminalLine(`Exit code: ${result.exitCode}`, "error");
+                }
+            } catch (err) {
+                addTerminalLine(`Error: ${err.message || err}`, "error");
+            }
+        }
+
+        async function otgFastbootAction(label, fn) {
+            addTerminalLine(`(fastboot) ${label}`, "command");
+            try {
+                const result = await fn();
+                (result.info || []).forEach(line => addTerminalLine(line, "output"));
+                addTerminalLine(
+                    result.okay ? (result.message || "OKAY") : `FAIL: ${result.message}`,
+                    result.okay ? "output" : "error"
+                );
+            } catch (err) {
+                addTerminalLine(`Error: ${err.message || err}`, "error");
+            }
+        }
+
+        // Intercept terminal submissions while an ADB-mode OTG session is
+        // active, so commands go to the TARGET device instead of the local
+        // root bridge. Falls through untouched otherwise.
+        const terminalForm = $("#terminalForm");
+        if (terminalForm) {
+            terminalForm.addEventListener("submit", event => {
+                if (!otgState.connected || otgState.mode !== "adb") return;
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                const input = $("#terminalInput");
+                if (!input) return;
+                const command = input.value.trim();
+                if (!command) return;
+                input.value = "";
+                otgExecuteShell(command);
+            }, true);
+        }
+
+        const connectBtn = $("#otgConnectButton");
+        if (connectBtn) {
+            connectBtn.addEventListener("click", () => {
+                if (otgState.connected) {
+                    otgDisconnect();
+                } else {
+                    otgConnect();
+                }
+            });
+        }
+
+        document.querySelectorAll("[data-otg-log]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (!otgState.connected || otgState.mode !== "adb") {
+                    showToast("Connect via OTG (ADB mode) first.");
+                    return;
+                }
+                navigate("terminal");
+                otgExecuteShell(btn.getAttribute("data-otg-log"));
+            });
+        });
+
+        document.querySelectorAll("[data-fastboot-action]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (!otgState.connected || otgState.mode !== "fastboot") {
+                    showToast("Connect via OTG (Fastboot mode) first.");
+                    return;
+                }
+                const action = btn.getAttribute("data-fastboot-action");
+                navigate("terminal");
+
+                if (action === "unlock") {
+                    if (!confirm("Unlock the TARGET device's bootloader? This will WIPE ALL DATA on that device.")) return;
+                    otgFastbootAction("flashing unlock", () => window.FastbootBridge.unlock());
+                } else if (action === "lock") {
+                    if (!confirm("Lock the TARGET device's bootloader?")) return;
+                    otgFastbootAction("flashing lock", () => window.FastbootBridge.lock());
+                } else if (action === "reboot-bootloader") {
+                    otgFastbootAction("reboot-bootloader", () => window.FastbootBridge.rebootBootloader());
+                } else if (action === "reboot") {
+                    otgFastbootAction("reboot", () => window.FastbootBridge.reboot());
+                } else if (action === "flash") {
+                    const partition = prompt("Partition name to flash on the TARGET device (e.g. boot, vbmeta, super):");
+                    if (!partition) return;
+                    if (!confirm(`Flash the file you pick to "${partition}" on the TARGET device? A wrong image can brick it.`)) return;
+                    otgFastbootAction(`flash ${partition}`, () => window.FastbootBridge.flash({ partition }));
+                } else if (action === "erase") {
+                    const partition = prompt("Partition name to erase on the TARGET device:");
+                    if (!partition) return;
+                    if (!confirm(`Erase "${partition}" on the TARGET device? This cannot be undone.`)) return;
+                    otgFastbootAction(`erase ${partition}`, () => window.FastbootBridge.erase({ partition }));
+                }
+            });
+        });
+
+        otgToggleUI();
+    })();
+
+})();
+    </script>
+
+</div>
+
+</body>
+</html>
