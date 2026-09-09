@@ -1,79 +1,40 @@
 package com.adbutility.app.usb.fastboot
 
 import com.adbutility.app.usb.transport.UsbBulkTransport
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.util.Locale
 
 data class FastbootResult(val okay: Boolean, val message: String, val infoLines: List<String>)
 
-/** Minimal USB fastboot protocol client. */
+/**
+ * Minimal fastboot protocol client.
+ *
+ * The wire protocol is very simple compared to ADB: the host sends a raw
+ * ASCII command as a single bulk-OUT packet, and the device replies with one
+ * or more 4-byte-prefixed packets:
+ *   "OKAY<msg>" - success, <msg> may be empty
+ *   "FAIL<msg>" - failure, <msg> is a human-readable reason
+ *   "INFO<msg>" - progress/log line, more replies follow
+ *   "DATA<hex8>" - device is ready to receive <hex8> bytes (used for download)
+ */
 class FastbootConnection(private val transport: UsbBulkTransport) {
 
     @Synchronized
     fun command(cmd: String, timeoutMs: Long = 15_000): FastbootResult {
-        require(cmd.isNotEmpty()) { "Fastboot command is empty" }
-        require(cmd.length <= 64) { "Fastboot command is too long" }
         transport.write(cmd.toByteArray(Charsets.US_ASCII))
         return readResponses(timeoutMs)
     }
 
-    /** Sends one DOWNLOAD transaction. The caller must keep data <= max-download-size. */
+    /** Sends the DOWNLOAD command followed by the raw bytes of [data]. */
     @Synchronized
     fun download(data: ByteArray, timeoutMs: Long = 60_000): FastbootResult {
-        val header = "download:%08x".format(Locale.US, data.size)
+        val header = "download:%08x".format(data.size)
         transport.write(header.toByteArray(Charsets.US_ASCII))
-
-        val ready = readResponses(timeoutMs)
-        if (!ready.okay || ready.message.length != 8 || !ready.message.all { it in "0123456789abcdefABCDEF" }) {
-            return if (!ready.okay) ready
-            else FastbootResult(false, "Bootloader did not accept download: ${ready.message}", ready.infoLines)
-        }
+        readResponses(timeoutMs) // "DATA........" readiness reply
 
         transport.write(data)
         return readResponses(timeoutMs)
-    }
-
-    /**
-     * Flashes a file which fits in one fastboot download. Android sparse images
-     * are accepted as-is: the bootloader/fastbootd performs the sparse expansion.
-     *
-     * Important protocol limitation: standard USB fastboot has one DOWNLOAD
-     * buffer followed by one FLASH command; there is no portable host-side
-     * "append this next download at partition offset" operation. Therefore a
-     * sparse file whose *encoded file size* exceeds max-download-size cannot be
-     * safely split into independent downloads by a generic client.
-     */
-    fun flashFromStream(partition: String, input: InputStream, totalSize: Long, maxDownloadSize: Long): FastbootResult {
-        require(partition.isNotBlank()) { "Empty partition name" }
-        if (totalSize <= 0L) return FastbootResult(false, "Image is empty", emptyList())
-        if (totalSize > maxDownloadSize) {
-            return FastbootResult(
-                false,
-                "Image is $totalSize bytes but bootloader max-download-size is $maxDownloadSize bytes. " +
-                    "A standard fastboot session cannot split one flash transaction safely; use fastbootd/a larger download buffer or a device-specific streaming protocol.",
-                emptyList()
-            )
-        }
-        if (totalSize > Int.MAX_VALUE) {
-            return FastbootResult(false, "Image is too large for this Android client buffer", emptyList())
-        }
-
-        val buffer = ByteArray(totalSize.toInt())
-        var read = 0
-        while (read < buffer.size) {
-            val n = input.read(buffer, read, buffer.size - read)
-            if (n < 0) break
-            if (n == 0) continue
-            read += n
-        }
-        if (read != buffer.size) {
-            return FastbootResult(false, "Failed to read image (got $read of ${buffer.size} bytes)", emptyList())
-        }
-
-        val downloadResult = download(buffer)
-        if (!downloadResult.okay) return downloadResult
-        return command("flash:$partition")
     }
 
     fun getVar(name: String): String? {
@@ -85,23 +46,92 @@ class FastbootConnection(private val transport: UsbBulkTransport) {
     fun reboot() = command("reboot")
     fun continueBoot() = command("continue")
     fun erase(partition: String) = command("erase:$partition")
+
+    /** Modern devices (Android 5+): `fastboot flashing unlock` / `flashing lock`. */
     fun flashingUnlock() = command("flashing unlock")
     fun flashingLock() = command("flashing lock")
+
+    /** Legacy fallback for older bootloaders that only support `oem unlock`/`oem lock`. */
     fun oemUnlock() = command("oem unlock")
     fun oemLock() = command("oem lock")
+
+    /**
+     * Flashes [input] (a raw or Android-sparse image, any size) to [partition].
+     *
+     * Images larger than [maxDownloadSize] are automatically split into
+     * multiple standalone sparse chunks (same technique AOSP's `fastboot`
+     * uses for oversized images like super.img) and flashed to the same
+     * partition sequentially. [tempDir] is used to stage the split chunks on
+     * disk (pass the app's cache directory) - they're deleted afterwards.
+     */
+    fun flashLargeImage(
+        partition: String,
+        input: InputStream,
+        totalSize: Long,
+        maxDownloadSize: Int,
+        tempDir: File,
+        onProgress: (partDone: Int, partsTotal: Int) -> Unit = { _, _ -> }
+    ): FastbootResult {
+        val safeMax = (maxDownloadSize - 8192).coerceAtLeast(64 * 1024)
+
+        val splits = try {
+            SparseSplitter.split(input, totalSize, safeMax, tempDir)
+        } catch (e: Exception) {
+            return FastbootResult(false, "Failed to prepare image for flashing: ${e.message}", emptyList())
+        }
+
+        try {
+            splits.forEachIndexed { index, split ->
+                onProgress(index, splits.size)
+
+                val bytes = try {
+                    split.file.readBytes()
+                } catch (e: Exception) {
+                    return FastbootResult(false, "Failed to read staged image part ${index + 1}/${splits.size}: ${e.message}", emptyList())
+                }
+
+                val downloadResult = download(bytes)
+                if (!downloadResult.okay) {
+                    return FastbootResult(
+                        false,
+                        "Download failed on part ${index + 1}/${splits.size}: ${downloadResult.message}",
+                        emptyList()
+                    )
+                }
+
+                val flashResult = command("flash:$partition")
+                if (!flashResult.okay) {
+                    return FastbootResult(
+                        false,
+                        "Flash failed on part ${index + 1}/${splits.size}: ${flashResult.message}",
+                        emptyList()
+                    )
+                }
+            }
+
+            onProgress(splits.size, splits.size)
+            return FastbootResult(true, "Flashed \"$partition\" successfully (${splits.size} part(s)).", emptyList())
+        } finally {
+            splits.forEach { it.file.delete() }
+        }
+    }
+
+    // ---------------------------------------------------------------
 
     private fun readResponses(timeoutMs: Long): FastbootResult {
         val infoLines = mutableListOf<String>()
         val deadline = System.currentTimeMillis() + timeoutMs
 
         while (System.currentTimeMillis() < deadline) {
-            val packet = readResponsePacket(deadline)
-            if (packet == null) continue
-            val text = String(packet, Charsets.US_ASCII)
-            if (text.length < 4) throw IOException("Short fastboot response: ${text.length} bytes")
+            val raw = transport.readOnce(4096)
+            if (raw.isEmpty()) continue
+
+            val text = String(raw, Charsets.US_ASCII)
+            if (text.length < 4) continue
 
             val prefix = text.substring(0, 4)
             val rest = text.substring(4)
+
             when (prefix) {
                 "OKAY" -> return FastbootResult(true, rest, infoLines)
                 "FAIL" -> return FastbootResult(false, rest, infoLines)
@@ -110,19 +140,7 @@ class FastbootConnection(private val transport: UsbBulkTransport) {
                 else -> return FastbootResult(false, "Unexpected response: $text", infoLines)
             }
         }
+
         throw IOException("Fastboot command timed out")
     }
-
-    /**
-     * Fastboot status packets are short (the protocol reserves at most 64
-     * bytes for the reply). Reading one USB transfer at that size avoids
-     * accidentally consuming an INFO packet and the following OKAY packet in
-     * one oversized Android bulkTransfer call.
-     */
-    private fun readResponsePacket(deadline: Long): ByteArray? {
-        if (System.currentTimeMillis() >= deadline) throw IOException("Fastboot response timed out")
-        val packet = transport.readOnce(64)
-        return if (packet.isEmpty()) null else packet
-    }
-
 }

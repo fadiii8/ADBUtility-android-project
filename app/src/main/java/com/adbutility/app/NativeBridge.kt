@@ -225,7 +225,7 @@ class NativeBridge(
 
                     val resolver = webView.context.contentResolver
                     val size = resolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
-                    if (size <= 0L) {
+                    if (size <= 0) {
                         reject(callbackId, "Could not determine a valid file size")
                         return@execute
                     }
@@ -235,7 +235,16 @@ class NativeBridge(
                             reject(callbackId, "Could not open selected file")
                             return@execute
                         }
-                        val result = fb.flashFromStream(partition, input, size, usbSessions.maxDownloadSize)
+                        // Images bigger than maxDownloadSize (e.g. super.img) are
+                        // automatically split into multiple sparse chunks and
+                        // flashed in sequence - see FastbootConnection.flashLargeImage.
+                        val result = fb.flashLargeImage(
+                            partition,
+                            input,
+                            size,
+                            usbSessions.maxDownloadSize,
+                            webView.context.cacheDir
+                        )
                         resolve(callbackId, fastbootResultJson(result).toString())
                     }
                 } catch (e: Exception) {
