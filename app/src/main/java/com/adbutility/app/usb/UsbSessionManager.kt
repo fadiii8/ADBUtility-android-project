@@ -48,7 +48,7 @@ class UsbSessionManager(private val context: Context) {
         private set
     var fastbootConnection: FastbootConnection? = null
         private set
-    var maxDownloadSize: Long = 4L * 1024 * 1024
+    var maxDownloadSize: Int = 4 * 1024 * 1024
         private set
 
     val isConnected: Boolean
@@ -57,13 +57,11 @@ class UsbSessionManager(private val context: Context) {
     fun connect(onResult: (success: Boolean, message: String) -> Unit) {
         val candidate = findCandidateInterface()
         if (candidate == null) {
-            onResult(false, "No ADB or Fastboot device found on USB. Check the OTG cable and target device.")
+            onResult(false, "No ADB/Fastboot interface found.\n" + buildDiagnostics())
             return
         }
 
         val (device, iface, detectedMode) = candidate
-
-        if (isConnected) disconnect()
 
         if (usbManager.hasPermission(device)) {
             openSession(device, iface, detectedMode, onResult)
@@ -76,6 +74,51 @@ class UsbSessionManager(private val context: Context) {
                 }
             }
         }
+    }
+
+    /**
+     * Human-readable dump of every USB device Android currently sees and
+     * their interfaces, so a "not found" failure can be diagnosed without
+     * needing a debugger attached - this is the #1 thing to check first:
+     * if the list is completely EMPTY, the target phone never showed up on
+     * the bus at all (a cable/USB-role issue, not an app bug); if devices
+     * appear but none match class=0xFF/sub=0x42, the target is attached but
+     * not exposing an ADB/Fastboot interface (wrong USB mode or debugging
+     * not enabled on the target).
+     */
+    private fun buildDiagnostics(): String {
+        val devices = usbManager.deviceList.values
+        if (devices.isEmpty()) {
+            return "No USB device is visible to Android at all right now.\n" +
+                "This usually means the TARGET phone never enumerated as a USB " +
+                "peripheral on the bus - check:\n" +
+                "- Is this phone's USB-C port actually OTG/host-capable? (test: plug " +
+                "in a USB flash drive here and see if any app can see it)\n" +
+                "- On the TARGET phone, look for a USB notification (often says " +
+                "something like \"USB controlled by...\") and make sure it's set so " +
+                "THIS phone is the host / the target is the connected device, not " +
+                "the other way around\n" +
+                "- Try the cable in the other orientation, or a different C-to-C cable"
+        }
+
+        val sb = StringBuilder("Found ${devices.size} USB device(s), but none exposed an ADB/Fastboot interface:\n")
+        for (device in devices) {
+            sb.append("- vendorId=0x${device.vendorId.toString(16)} productId=0x${device.productId.toString(16)} ")
+            sb.append("name=${device.deviceName} interfaces=${device.interfaceCount}\n")
+            for (i in 0 until device.interfaceCount) {
+                val iface = device.getInterface(i)
+                sb.append(
+                    "    iface#$i class=0x${iface.interfaceClass.toString(16)} " +
+                        "subclass=0x${iface.interfaceSubclass.toString(16)} " +
+                        "protocol=0x${iface.interfaceProtocol.toString(16)}\n"
+                )
+            }
+        }
+        sb.append("Expected class=0xff subclass=0x42 protocol=0x01 (ADB) or 0x03 (Fastboot).\n")
+        sb.append("If the target is in normal Android (not bootloader), make sure " +
+            "Developer Options > USB debugging is ON on the target, and its USB " +
+            "connection mode isn't set to \"Charging only\".")
+        return sb.toString()
     }
 
     @Synchronized
@@ -118,9 +161,8 @@ class UsbSessionManager(private val context: Context) {
     }
 
     private fun requestPermission(device: UsbDevice, callback: (Boolean) -> Unit) {
-        val flags = PendingIntent.FLAG_UPDATE_CURRENT or
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
-        val intent = PendingIntent.getBroadcast(context, device.deviceId, Intent(actionUsbPermission), flags)
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        val intent = PendingIntent.getBroadcast(context, 0, Intent(actionUsbPermission), flags)
 
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
@@ -132,7 +174,7 @@ class UsbSessionManager(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(receiver, IntentFilter(actionUsbPermission), Context.RECEIVER_NOT_EXPORTED)
+            context.registerReceiver(receiver, IntentFilter(actionUsbPermission), Context.RECEIVER_EXPORTED)
         } else {
             @Suppress("UnspecifiedRegisterReceiverFlag")
             context.registerReceiver(receiver, IntentFilter(actionUsbPermission))
@@ -200,8 +242,8 @@ class UsbSessionManager(private val context: Context) {
         }
     }
 
-    private fun parseSize(raw: String): Long? {
+    private fun parseSize(raw: String): Int? {
         val trimmed = raw.trim().removePrefix("0x").removePrefix("0X")
-        return trimmed.toLongOrNull(16) ?: trimmed.toLongOrNull()
+        return trimmed.toIntOrNull(16) ?: trimmed.toIntOrNull()
     }
 }
